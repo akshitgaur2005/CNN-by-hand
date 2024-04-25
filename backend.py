@@ -61,6 +61,31 @@ class Dense():
         da_i_1 = np.dot(np.multiply(da_i, relu(self.forward(a_i_1))), self.weights.T)
         return dw_i, db_i, da_i_1
 
+class CNN():
+    def __init__(self, kernel_size, out_feats, stride=1, padding=0):
+        self.kernel_size = kernel_size
+        self.out_feats = out_feats
+        #self.weights = np.random.randn(out_feats, kernel_size, kernel_size)
+        self.weights = np.arange(self.out_feats * kernel_size ** 2).reshape(out_feats, kernel_size, kernel_size)
+        self.stride = stride
+        self.padding = padding
+
+    def forward(self, X):
+        d, m, n = X.shape
+        width_out = int((m - self.kernel_size + 2 * self.padding) / self.stride + 1)
+        Z = np.zeros((self.out_feats, width_out, width_out))
+        for dim in range(self.out_feats):
+            for i in range(width_out):
+                for j in range(width_out):
+                    m = self.stride * i
+                    n = self.stride * j
+                    inp = X[:, m : m + self.kernel_size, n : n + self.kernel_size]
+                    Z[dim, i, j] = np.sum(np.multiply(inp, self.weights[dim]))
+        return Z
+
+                
+
+
 class Model():
 
     def __init__(self, neurons=[3, 3, 2, 1]):
